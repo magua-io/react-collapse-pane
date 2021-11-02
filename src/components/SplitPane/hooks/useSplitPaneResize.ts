@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SplitPaneProps, CollapseOptions } from '..';
-import { useDragState, BeginDragCallback } from './effects/useDragState';
+import { useDragState, BeginDragCallback, DragState } from './effects/useDragState';
 import { useMinSizes } from './memos/useMinSizes';
 import { useGetMovedSizes } from './callbacks/useGetMovedSizes';
 import { useIsCollapseReversed } from './memos/useIsCollapseReversed';
@@ -29,6 +29,7 @@ interface SplitPaneResizeReturns {
   childPanes: ChildPane[];
   resizingIndex: Nullable<number>;
   handleDragStart: BeginDragCallback;
+  dragState: DragState | null;
 }
 
 interface SplitPaneResizeOptions
@@ -178,5 +179,6 @@ export const useSplitPaneResize = (options: SplitPaneResizeOptions): SplitPaneRe
     childPanes: childPanesWithSizes,
     resizingIndex: dragState?.index ?? null,
     handleDragStart,
+    dragState,
   };
 };
