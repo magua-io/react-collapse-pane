@@ -5,7 +5,7 @@ const Button = styled.div`
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 300px;
-  background: #0092d1;
+  background: #0e6ff9;
   cursor: pointer;
   user-select: none;
   text-align: center;
