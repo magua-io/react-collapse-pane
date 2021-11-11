@@ -47,15 +47,13 @@ export const Resizer = ({
   isCollapsed,
   dragState,
 }: ResizerProps) => {
-  if (!!resizerOptions) {
-    if (dragState !== null) {
-      resizerOptions.grabberSize = '100rem';
-    }
-    else {
-      resizerOptions.grabberSize = '0.5rem';
-    }
+
+  let { grabberSize, css, hoverCss } = { ...defaultResizerOptions, ...resizerOptions };
+
+  // to avoid iframe take over the mouse event
+  if (dragState !== null) {
+    grabberSize = '100rem';
   }
-  const { grabberSize, css, hoverCss } = { ...defaultResizerOptions, ...resizerOptions };
 
   const classes = useMergeClasses(['Resizer', split, className]);
   const grabberSizeWithUnit = useMemo(() => getSizeWithUnit(grabberSize), [grabberSize]);

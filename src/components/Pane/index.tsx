@@ -65,7 +65,7 @@ const CollapseOverlay = styled.div<{ $timeout: number; $isCollapsed: boolean }>`
 export interface PaneProps {
   size: number;
   minSize: number;
-  maxSize: number | null;
+  maxSize: number | undefined;
   isVertical: boolean;
   split: SplitType;
   className?: string;
@@ -125,6 +125,14 @@ const UnMemoizedPane = ({
   const widthPreserverStyle: React.CSSProperties = isCollapsed
     ? { ...minStyle, ...maxStyle, userSelect: 'none' }
     : { ...minStyle, ...maxStyle };
+
+  const PaneRootMinMaxStyle: React.CSSProperties = isVertical
+  ? isCollapsed
+    ? { minWidth: 0 }
+    : { minWidth: minSize, maxWidth: maxSize }
+  : isCollapsed
+    ? { minHeight: 0 }
+    : { minHeight: minSize, maxHeight: maxSize }
   return (
     <PaneRoot
       $isVertical={isVertical}
@@ -136,8 +144,7 @@ const UnMemoizedPane = ({
         flexBasis: size,
         flexGrow: isCollapsed ? 0 : flexGrow,
         flexShrink: isCollapsed ? 0 : flexShrink,
-        minWidth: isCollapsed ? 0 : minSize,
-        maxWidth: maxSize ?? 10000,
+        ...PaneRootMinMaxStyle,
       }}
     >
       <CollapseOverlay $isCollapsed={isCollapsed} $timeout={timeout} style={collapseOverlayCss} />

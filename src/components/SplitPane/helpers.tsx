@@ -21,7 +21,7 @@ export const getMinSize = (index: number, minSizes?: number | number[]): number 
   return DEFAULT_MIN_SIZE;
 };
 
-export const getMaxSize = (index: number, maxSizes?: number | number[]): number | null => {
+export const getMaxSize = (index: number, maxSizes?: number | number[]): number | undefined => {
   if (typeof maxSizes === 'number') {
     if (maxSizes > 0) {
       return maxSizes;
@@ -32,7 +32,7 @@ export const getMaxSize = (index: number, maxSizes?: number | number[]): number 
       return value;
     }
   }
-  return null;
+  return undefined;
 };
 
 export const getFlexGrow = (index: number, flexGrow?: number | number[]): number => {
