@@ -3,6 +3,7 @@ import { useMergeClasses } from '../../hooks/useMergeClasses';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { SplitType } from '../SplitPane';
+import type { DragState } from '../SplitPane/hooks/effects/useDragState';
 
 const DEFAULT_COLLAPSE_TRANSITION_TIMEOUT = 500;
 const verticalCss = css`
@@ -26,6 +27,7 @@ interface PaneRootProps {
   $shouldAnimate: boolean;
   $timeout: number;
 }
+
 const PaneRoot = styled.div<PaneRootProps>`
   position: relative;
   outline: none;
@@ -63,6 +65,7 @@ const CollapseOverlay = styled.div<{ $timeout: number; $isCollapsed: boolean }>`
 export interface PaneProps {
   size: number;
   minSize: number;
+  maxSize: number | undefined;
   isVertical: boolean;
   split: SplitType;
   className?: string;
@@ -72,10 +75,14 @@ export interface PaneProps {
   collapsedIndices: number[];
   children: React.ReactNode;
   transitionTimeout: number | undefined;
+  flexGrow: number | undefined;
+  flexShrink: number | undefined;
+  dragState: DragState | null;
 }
 const UnMemoizedPane = ({
   size,
   minSize,
+  maxSize,
   isCollapsed,
   collapseOverlayCss = { background: 'rgba(220,220,220, 0.1)' },
   isVertical,
@@ -85,6 +92,8 @@ const UnMemoizedPane = ({
   forwardRef,
   collapsedIndices,
   transitionTimeout,
+  flexGrow,
+  flexShrink,
 }: PaneProps) => {
   const classes = useMergeClasses(['Pane', split, className]);
   const timeout = useMemo(() => transitionTimeout ?? DEFAULT_COLLAPSE_TRANSITION_TIMEOUT, [
@@ -109,9 +118,21 @@ const UnMemoizedPane = ({
     minSize,
     isVertical,
   ]);
+  const maxStyle = maxSize ? useMemo(() => (isVertical ? { maxWidth: maxSize } : { maxHeight: maxSize }), [
+    maxSize,
+    isVertical,
+  ]) : {};
   const widthPreserverStyle: React.CSSProperties = isCollapsed
-    ? { ...minStyle, userSelect: 'none' }
-    : minStyle;
+    ? { ...minStyle, ...maxStyle, userSelect: 'none' }
+    : { ...minStyle, ...maxStyle };
+
+  const PaneRootMinMaxStyle: React.CSSProperties = isVertical
+  ? isCollapsed
+    ? { minWidth: 0 }
+    : { minWidth: minSize, maxWidth: maxSize }
+  : isCollapsed
+    ? { minHeight: 0 }
+    : { minHeight: minSize, maxHeight: maxSize }
   return (
     <PaneRoot
       $isVertical={isVertical}
@@ -119,7 +140,12 @@ const UnMemoizedPane = ({
       $timeout={timeout}
       className={classes}
       ref={forwardRef}
-      style={{ flexBasis: size, flexGrow: isCollapsed ? 0 : 1 }}
+      style={{
+        flexBasis: size,
+        flexGrow: isCollapsed ? 0 : flexGrow,
+        flexShrink: isCollapsed ? 0 : flexShrink,
+        ...PaneRootMinMaxStyle,
+      }}
     >
       <CollapseOverlay $isCollapsed={isCollapsed} $timeout={timeout} style={collapseOverlayCss} />
       <WidthPreserver $isCollapsed={isCollapsed} style={widthPreserverStyle}>

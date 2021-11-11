@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pane } from '../Pane';
 import { Resizer } from '../Resizer';
 import { useSplitPaneResize } from './hooks/useSplitPaneResize';
-import { convertCollapseSizesToIndices, getMinSize, Wrapper } from './helpers';
+import { convertCollapseSizesToIndices, getMinSize, Wrapper, getFlexGrow, getFlexShrink, getMaxSize } from './helpers';
 import { useMergeClasses } from '../../hooks/useMergeClasses';
 import { useIsCollapseReversed } from './hooks/memos/useIsCollapseReversed';
 import { useToggleCollapse } from './hooks/callbacks/useToggleCollapse';
@@ -50,12 +50,15 @@ export interface SplitPaneProps {
 
   initialSizes?: number[];
   minSizes?: number | number[];
+  maxSizes?: number | number[];
   collapsedSizes?: Nullable<number>[];
 
   hooks?: SplitPaneHooks;
   resizerOptions?: ResizerOptions;
 
   children: React.ReactChild[];
+  flexGrows: number | number[];
+  flexShrinks: number | number[];
 }
 
 export const SplitPane: React.FC<SplitPaneProps> = (props) => {
@@ -99,17 +102,6 @@ export const SplitPane: React.FC<SplitPaneProps> = (props) => {
     return <>{props.children}</>;
   }
 
-  // STATE: if dragging, contains which pane is dragging and what the offset is.  If not dragging then null
-  // const { dragState } = useDragState(isVertical, () => {});
-
-  const mouseEventBlockerStyle: React.CSSProperties = {
-    width: '100%',
-    height: '100%',
-    position: 'fixed',
-    zIndex: 100,
-    opacity: 0,
-  };
-
   // stacks the children and places a resizer in between each of them. Each resizer has the same index as the pane that it controls.
   const entries = childPanes.map((pane, paneIndex) => {
     const resizerPaneIndex = isReversed ? paneIndex : paneIndex - 1;
@@ -128,9 +120,9 @@ export const SplitPane: React.FC<SplitPaneProps> = (props) => {
             collapseOptions={collapseOptions}
             onDragStarted={handleDragStart}
             onCollapseToggle={toggleCollapse}
+            dragState={dragState}
           />
         ) : null}
-        {dragState !== null && <div style={mouseEventBlockerStyle} />}
         <Pane
           key={`pane.${paneIndex}`}
           forwardRef={pane.ref}
@@ -140,9 +132,13 @@ export const SplitPane: React.FC<SplitPaneProps> = (props) => {
           split={props.split}
           isVertical={isVertical}
           minSize={getMinSize(paneIndex, props.minSizes)}
+          maxSize={getMaxSize(paneIndex, props.maxSizes)}
           className={props.className}
           transitionTimeout={collapseOptions?.collapseTransitionTimeout}
           collapseOverlayCss={collapseOptions?.overlayCss}
+          flexGrow={getFlexGrow(paneIndex, props.flexGrows)}
+          flexShrink={getFlexShrink(paneIndex, props.flexShrinks)}
+          dragState={dragState}
         >
           {pane.node}
         </Pane>

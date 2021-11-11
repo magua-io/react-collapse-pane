@@ -13,6 +13,7 @@ import { CollapseOptions, ResizerOptions } from '../SplitPane';
 import { useTransition } from './hooks/useTransition';
 import { SplitType } from '../SplitPane';
 import { debounce } from '../SplitPane/helpers';
+import type { DragState } from '../SplitPane/hooks/effects/useDragState';
 
 const defaultResizerOptions: Required<ResizerOptions> = {
   grabberSize: '1rem',
@@ -31,6 +32,7 @@ export interface ResizerProps {
   onDragStarted: BeginDragCallback;
   onCollapseToggle: (paneIndex: number) => void;
   isCollapsed: boolean;
+  dragState: DragState | null;
 }
 export const Resizer = ({
   isVertical,
@@ -43,8 +45,15 @@ export const Resizer = ({
   onCollapseToggle,
   isLtr,
   isCollapsed,
+  dragState,
 }: ResizerProps) => {
-  const { grabberSize, css, hoverCss } = { ...defaultResizerOptions, ...resizerOptions };
+
+  let { grabberSize, css, hoverCss } = { ...defaultResizerOptions, ...resizerOptions };
+
+  // to avoid iframe take over the mouse event
+  if (dragState !== null) {
+    grabberSize = '100rem';
+  }
 
   const classes = useMergeClasses(['Resizer', split, className]);
   const grabberSizeWithUnit = useMemo(() => getSizeWithUnit(grabberSize), [grabberSize]);
