@@ -5,6 +5,7 @@ import { Nullable } from '../../types/utilities';
 
 export const DEFAULT_MIN_SIZE = 50;
 export const DEFAULT_FLEX_GROW = 1;
+export const DEFAULT_FLEX_SHRINK = 1;
 
 export const getMinSize = (index: number, minSizes?: number | number[]): number => {
   if (typeof minSizes === 'number') {
@@ -46,6 +47,20 @@ export const getFlexGrow = (index: number, flexGrow?: number | number[]): number
     }
   }
   return DEFAULT_FLEX_GROW;
+};
+
+export const getFlexShrink = (index: number, flexShrink?: number | number[]): number => {
+  if (typeof flexShrink === 'number') {
+    if (flexShrink >= 0) {
+      return flexShrink;
+    }
+  } else if (flexShrink instanceof Array) {
+    const value = flexShrink[index];
+    if (value >= 0) {
+      return value;
+    }
+  }
+  return DEFAULT_FLEX_SHRINK;
 };
 
 export const getRefSize = ({

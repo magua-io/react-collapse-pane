@@ -27,6 +27,7 @@ interface PaneRootProps {
   $shouldAnimate: boolean;
   $timeout: number;
 }
+
 const PaneRoot = styled.div<PaneRootProps>`
   position: relative;
   outline: none;
@@ -75,6 +76,7 @@ export interface PaneProps {
   children: React.ReactNode;
   transitionTimeout: number | undefined;
   flexGrow: number | undefined;
+  flexShrink: number | undefined;
   dragState: DragState | null;
 }
 const UnMemoizedPane = ({
@@ -91,6 +93,7 @@ const UnMemoizedPane = ({
   collapsedIndices,
   transitionTimeout,
   flexGrow,
+  flexShrink,
 }: PaneProps) => {
   const classes = useMergeClasses(['Pane', split, className]);
   const timeout = useMemo(() => transitionTimeout ?? DEFAULT_COLLAPSE_TRANSITION_TIMEOUT, [
@@ -132,6 +135,7 @@ const UnMemoizedPane = ({
       style={{
         flexBasis: size,
         flexGrow: isCollapsed ? 0 : flexGrow,
+        flexShrink: isCollapsed ? 0 : flexShrink,
         minWidth: isCollapsed ? 0 : minSize,
         maxWidth: maxSize ?? 10000,
       }}

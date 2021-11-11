@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pane } from '../Pane';
 import { Resizer } from '../Resizer';
 import { useSplitPaneResize } from './hooks/useSplitPaneResize';
-import { convertCollapseSizesToIndices, getMinSize, Wrapper, getFlexGrow, getMaxSize } from './helpers';
+import { convertCollapseSizesToIndices, getMinSize, Wrapper, getFlexGrow, getFlexShrink, getMaxSize } from './helpers';
 import { useMergeClasses } from '../../hooks/useMergeClasses';
 import { useIsCollapseReversed } from './hooks/memos/useIsCollapseReversed';
 import { useToggleCollapse } from './hooks/callbacks/useToggleCollapse';
@@ -58,6 +58,7 @@ export interface SplitPaneProps {
 
   children: React.ReactChild[];
   flexGrows: number | number[];
+  flexShrinks: number | number[];
 }
 
 export const SplitPane: React.FC<SplitPaneProps> = (props) => {
@@ -136,6 +137,7 @@ export const SplitPane: React.FC<SplitPaneProps> = (props) => {
           transitionTimeout={collapseOptions?.collapseTransitionTimeout}
           collapseOverlayCss={collapseOptions?.overlayCss}
           flexGrow={getFlexGrow(paneIndex, props.flexGrows)}
+          flexShrink={getFlexShrink(paneIndex, props.flexShrinks)}
           dragState={dragState}
         >
           {pane.node}
